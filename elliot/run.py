@@ -19,7 +19,8 @@ from elliot.namespace.namespace_model_builder import NameSpaceBuilder
 from elliot.result_handler.result_handler import ResultHandler, HyperParameterStudy, StatTest
 from elliot.utils import logging as logging_project
 
-_rstate = np.random.RandomState(42)
+# _rstate = np.random.RandomState(42)
+_rstate = np.random.Generator(np.random.MT19937(42))
 here = path.abspath(path.dirname(__file__))
 
 print(u'''
@@ -100,6 +101,7 @@ def run_experiment(config_path: str = ''):
                 test_trials.append(trials)
                 logger.info(f"Tuning ended for {model_class.__name__}")
             else:
+                # TODO: check why it seems like multiple instances are created of the model
                 logger.info(f"Training begun for {model_class.__name__}\\n")
                 single = model_placeholder.single()
 
