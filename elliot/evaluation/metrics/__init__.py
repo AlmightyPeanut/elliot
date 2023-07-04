@@ -43,6 +43,8 @@ from elliot.evaluation.metrics.fairness.BiasDisparity import BiasDisparityBR, Bi
 from elliot.evaluation.metrics.fairness.rsp import RSP
 from elliot.evaluation.metrics.fairness.reo import REO
 
+from elliot.evaluation.metrics.misinformation.ns.ns import NS
+
 from elliot.evaluation.metrics.statistical_array_metric import StatisticalMetric
 
 _metric_dictionary = {
@@ -89,7 +91,8 @@ _metric_dictionary = {
     "ExtendedPopRSP": ExtendedPopRSP,
     "ExtendedPopREO": ExtendedPopREO,
     "RSP": RSP,
-    "REO": REO
+    "REO": REO,
+    "NS": NS,
 }
 
 _lower_dict = {k.lower(): v for k, v in _metric_dictionary.items()}
