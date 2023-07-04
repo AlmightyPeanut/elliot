@@ -78,7 +78,7 @@ class LogisticMatrixFactorization(RecMixin, BaseRecommenderModel):
 
     @property
     def name(self):
-        return "LMF"\
+        return "LogisticMatrixFactorization"\
                + f"_{self.get_base_params_shortcut()}" \
                + f"_{self.get_params_shortcut()}"
 

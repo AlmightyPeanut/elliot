@@ -14,7 +14,7 @@ from .PureSVD import PureSVD
 from .MF import MF
 from .FunkSVD import FunkSVD
 from .PMF import PMF
-from .LogisticMF import LMF
+from .LogisticMF import LogisticMatrixFactorization
 from .NonNegMF import NonNegMF
 from .FM import FM
 from .FMnofeatures import FMnofeatures
