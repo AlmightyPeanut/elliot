@@ -44,6 +44,7 @@ from elliot.evaluation.metrics.fairness.rsp import RSP
 from elliot.evaluation.metrics.fairness.reo import REO
 
 from elliot.evaluation.metrics.misinformation.ns.ns import NS
+from elliot.evaluation.metrics.misinformation.serp_ms.serp_ms import SERP_MS
 
 from elliot.evaluation.metrics.statistical_array_metric import StatisticalMetric
 
@@ -93,6 +94,7 @@ _metric_dictionary = {
     "RSP": RSP,
     "REO": REO,
     "NS": NS,
+    "SERP-MS": SERP_MS,
 }
 
 _lower_dict = {k.lower(): v for k, v in _metric_dictionary.items()}
