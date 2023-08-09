@@ -71,7 +71,7 @@ class ProxyRecommender(RecMixin, BaseRecommenderModel):
         data = pd.read_csv(path, sep="\t", header=None, names=column_names)
         user_groups = data.groupby(['userId'])
         for name, group in user_groups:
-            recs[name] = sorted(data.loc[group.index][['itemId', 'prediction']].apply(tuple, axis=1).to_list(), key=lambda x: x[1], reverse=True)
+            recs[name[0]] = sorted(data.loc[group.index][['itemId', 'prediction']].apply(tuple, axis=1).to_list(), key=lambda x: x[1], reverse=True)
         return recs
 
 

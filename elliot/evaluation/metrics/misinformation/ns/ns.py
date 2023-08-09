@@ -25,8 +25,8 @@ class NS(BaseMetric):
                                                   sep='\t').set_index('video_id')
         self._misinformation_labels = self._misinformation_labels['label'].replace({
             'neutral': 0,
-            'debunking': 1,
-            'promoting': -1
+            'debunking': -1,
+            'promoting': 1
         })
 
     @staticmethod

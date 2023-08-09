@@ -79,11 +79,13 @@ class AttributeItemKNN(RecMixin, BaseRecommenderModel):
 
     def build_feature_sparse(self):
 
-        rows_cols = [(i, f) for i, features in self._i_feature_dict.items() for f in features]
-        rows = [u for u, _ in rows_cols]
-        cols = [i for _, i in rows_cols]
-        data = sp.csr_matrix((np.ones_like(rows), (rows, cols)), dtype='float32',
-                             shape=(self._num_items, len(self._side.public_features)))
+        # rows_cols = [(i, f) for i, features in self._i_feature_dict.items() for f in features]
+        # rows = [u for u, _ in rows_cols]
+        # cols = [i for _, i in rows_cols]
+        # data = sp.csr_matrix((np.ones_like(rows), (rows, cols)), dtype='float32',
+        #                      shape=(self._num_items, len(self._side.public_features)))
+        data = np.array(list(self._i_feature_dict.values()))
+        data = sp.csr_matrix(data)
         return data
 
     @property
