@@ -34,27 +34,27 @@ class NonNegMFModel(object):
         self._embed_mf_size = embed_mf_size
         self._lambda_weights = lambda_weights
 
-        self._user_bias = np.empty(self._num_users, np.double)
-        self._item_bias = np.empty(self._num_items, np.double)
-        self._user_embeddings = self._random_state.normal(size=(self._num_users, self._embed_mf_size))
-        self._item_embeddings = self._random_state.normal(size=(self._num_items, self._embed_mf_size))
+        self._user_bias = np.zeros(self._num_users, np.double)
+        self._item_bias = np.zeros(self._num_items, np.double)
+        # initialise non-negatively
+        self._user_embeddings = abs(self._random_state.normal(size=(self._num_users, self._embed_mf_size)))
+        self._item_embeddings = abs(self._random_state.normal(size=(self._num_items, self._embed_mf_size)))
 
     def train_step(self):
 
         # (re)initialize nums and denominators to zero
-        user_num = np.empty((self._num_users, self._embed_mf_size))
-        user_denom = np.empty((self._num_users, self._embed_mf_size))
-        item_num = np.empty((self._num_items, self._embed_mf_size))
-        item_denom = np.empty((self._num_items, self._embed_mf_size))
+        user_num = np.zeros((self._num_users, self._embed_mf_size))
+        user_denom = np.zeros((self._num_users, self._embed_mf_size))
+        item_num = np.zeros((self._num_items, self._embed_mf_size))
+        item_denom = np.zeros((self._num_items, self._embed_mf_size))
 
         # Compute numerators and denominators for users and items factors
         for u, u_ratings in self._i_train.items():
             for i, r_ui in u_ratings.items():
 
                 # compute current estimation and error
-                dot = 0  # <q_i, p_u>
-                for f in range(self._embed_mf_size):
-                    dot += self._item_embeddings[i, f] * self._user_embeddings[u, f]
+                # <q_i, p_u>
+                dot = self._item_embeddings[i].dot(self._user_embeddings[u])
                 est = self._global_mean + self._user_bias[u] + self._item_bias[i] + dot
                 err = r_ui - est
 
@@ -63,25 +63,22 @@ class NonNegMFModel(object):
                 self._item_bias[i] += self._learning_rate * (err - self._lambda_weights * self._item_bias[i])
 
                 # compute numerators and denominators
-                for f in range(self._embed_mf_size):
-                    user_num[u, f] += self._item_embeddings[i, f] * r_ui
-                    user_denom[u, f] += self._item_embeddings[i, f] * est
-                    item_num[i, f] += self._user_embeddings[u, f] * r_ui
-                    item_denom[i, f] += self._user_embeddings[u, f] * est
+                user_num[u] += self._item_embeddings[i] * r_ui
+                user_denom[u] += self._item_embeddings[i] * est
+                item_num[i] += self._user_embeddings[u] * r_ui
+                item_denom[i] += self._user_embeddings[u] * est
 
         # Update user factors
         for u, u_ratings in self._i_train.items():
             n_ratings = len(u_ratings)
-            for f in range(self._embed_mf_size):
-                user_denom[u, f] += n_ratings * self._lambda_weights * self._user_embeddings[u, f]
-                self._user_embeddings[u, f] *= user_num[u, f] / user_denom[u, f]
+            user_denom[u] += n_ratings * self._lambda_weights * self._user_embeddings[u]
+            self._user_embeddings[u] *= user_num[u] / user_denom[u]
 
         # Update item factors
         for i in range(self._num_items):
             n_ratings = self._data.sp_i_train.getcol(i).nnz
-            for f in range(self._embed_mf_size):
-                item_denom[i, f] += n_ratings * self._lambda_weights * self._item_embeddings[i, f]
-                self._item_embeddings[i, f] *= item_num[i, f] / item_denom[i, f]
+            item_denom += n_ratings * self._lambda_weights * self._item_embeddings[i]
+            self._item_embeddings[i] *= item_num[i] / item_denom[i]
 
     def predict(self, user, item):
         return self._user_embeddings[self._data.public_users[user], :].dot(
