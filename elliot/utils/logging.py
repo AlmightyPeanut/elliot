@@ -85,6 +85,9 @@ def get_logger_model(name, log_level=logging.DEBUG):
 
 
 def prepare_logger(name, path, log_level=logging.DEBUG):
+    if name in logging.root.manager.loggerDict:
+        return logging.getLogger(name)
+
     logger = logging.getLogger(name)
     logger.addFilter(TimeFilter())
     logger.setLevel(log_level)
